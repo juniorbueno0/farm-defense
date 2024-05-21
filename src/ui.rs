@@ -4,7 +4,7 @@ use bevy::{ecs::bundle, prelude::*};
 pub struct ButtonType(ObjectType);
 
 #[derive(Resource, Debug)]
-pub struct ObjectSelected(ObjectType);
+pub struct ObjectSelected(pub ObjectType);
 
 use crate::worldtile::ObjectType;
 
@@ -74,7 +74,6 @@ fn match_btn_sel(
             Interaction::Pressed => {
                 *inter.1 = BackgroundColor(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 1. });
                 obj_selected.0 = inter.2.0.clone();
-                println!("{:?}", obj_selected);
             },
             Interaction::Hovered => {},
             Interaction::None => {*inter.1 = BackgroundColor(Color::Rgba { red: 1., green: 0.54, blue: 0., alpha: 1. });},

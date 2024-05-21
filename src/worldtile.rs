@@ -27,7 +27,7 @@ pub struct WorldTilePlugin;
 impl Plugin for WorldTilePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, draw_map)
-            .add_systems(Update, (draw_path, mouse_highligth));
+            .add_systems(Update, (draw_path, mouse_highligth, spawn_object));
     }
 }
 
@@ -64,10 +64,10 @@ fn draw_map(mut commands: Commands) {
 
 fn draw_path(
     mut commands: Commands,
-    input: Res<ButtonInput<MouseButton>>,
+    input: Res<ButtonInput<KeyCode>>,
     mut query: Query<Entity, With<PathTile>>,
 ) {
-    if input.just_pressed(MouseButton::Left) {    
+    if input.just_pressed(KeyCode::KeyB) {    
  
         for tile in query.iter_mut() {
             commands.entity(tile).despawn();
@@ -139,15 +139,27 @@ fn draw_path(
     }
 }
 
-fn spawn_object(object_selected: Res<ObjectSelected>) {
-    
+fn spawn_object(
+    mut commands: Commands,
+    mouse_coords: Res<MyMouseCoords>,
+    input: Res<ButtonInput<MouseButton>>,
+    mut object_selected: ResMut<ObjectSelected>
+) {
+    if input.just_pressed(MouseButton::Left) {
+        match object_selected.0 {
+            ObjectType::Empty => { println!("empty"); },
+            ObjectType::Potato => { 
+                commands.spawn(SpriteBundle{sprite:Sprite{color:Color::Rgba{red:0.1, green:0.6,blue:0.6,alpha:1.},..default()},transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()});
+                object_selected.0 = ObjectType::Empty;
+            },
+        }
+    }
 }
 
 fn mouse_highligth(
     mouse_coords: Res<MyMouseCoords>,
     mut query_mouse: Query<&mut Transform, With<MouseSelection>>
 ) {
-    println!("{:?}",mouse_coords.0);
     for mut pixel in query_mouse.iter_mut() {
         pixel.translation = Vec3::new(mouse_coords.0.x, mouse_coords.0.y,1.);
     }
