@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{math::vec2, prelude::*};
 use rand::prelude::*;
 
 const WORLD_SIZE_X: i32 = 20;
@@ -10,12 +10,24 @@ struct WorldTile;
 #[derive(Component, Debug)]
 struct PathTile;
 
+#[derive(Component)]
+struct MouseSelection;
+
+#[derive(Component, Debug, Clone)]
+pub enum ObjectType {
+    Potato,
+    Empty
+}
+
+use crate::mouse::MyMouseCoords;
+use crate::ui::ObjectSelected; // object selected from the btn
+
 pub struct WorldTilePlugin;
 
 impl Plugin for WorldTilePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, draw_map)
-            .add_systems(Update, draw_path);
+            .add_systems(Update, (draw_path, mouse_highligth));
     }
 }
 
@@ -38,6 +50,16 @@ fn draw_map(mut commands: Commands) {
         x = 0;
         y += 1;
     }
+
+    // mouse pixel selected
+    commands.spawn(SpriteBundle {
+        sprite: Sprite {
+            color: Color::Rgba {red:1.,green:1.,blue:1.,alpha:0.3},
+            custom_size: Some(Vec2 {x:1.,y:1.}),
+            ..default()
+        },
+        ..default()
+    }).insert(MouseSelection);
 }
 
 fn draw_path(
@@ -114,5 +136,19 @@ fn draw_path(
             y = 0;
             i += 1;
         }
+    }
+}
+
+fn spawn_object(object_selected: Res<ObjectSelected>) {
+    
+}
+
+fn mouse_highligth(
+    mouse_coords: Res<MyMouseCoords>,
+    mut query_mouse: Query<&mut Transform, With<MouseSelection>>
+) {
+    println!("{:?}",mouse_coords.0);
+    for mut pixel in query_mouse.iter_mut() {
+        pixel.translation = Vec3::new(mouse_coords.0.x, mouse_coords.0.y,1.);
     }
 }

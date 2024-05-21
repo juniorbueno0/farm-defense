@@ -18,3 +18,7 @@ fn main() {
         .add_plugins(WorldTilePlugin)
         .run();
 }
+
+// PENDING 
+// add perlin to generate trees etc cannot build there 
+// 

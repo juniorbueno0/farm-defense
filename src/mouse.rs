@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 #[derive(Resource, Debug)]
-pub struct MyWorldCoords(pub Vec2);
+pub struct MyMouseCoords(pub Vec2);
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -11,22 +11,13 @@ pub struct MouseInteractionsPlugin;
 
 impl Plugin for MouseInteractionsPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(MyWorldCoords(Vec2 { x:0., y:0. }))
-            // .add_systems(Startup, setup)
+        app.insert_resource(MyMouseCoords(Vec2 { x:0., y:0. }))
             .add_systems(Update, cursor_to_world_position);
     }
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn(
-        Camera2dBundle {
-            ..default()
-        }
-    ).insert(MainCamera);
-}
-
 fn cursor_to_world_position(
-    mut mycoords: ResMut<MyWorldCoords>,
+    mut mycoords: ResMut<MyMouseCoords>,
     q_window: Query<&Window, With<PrimaryWindow>>,
     q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
@@ -43,6 +34,5 @@ fn cursor_to_world_position(
         let y_value: i32 = mycoords.0.y as i32;
         // to f32 
         mycoords.0 = Vec2::new(x_value as f32, y_value as f32);
-        println!("{:?}",mycoords.0);
     }
 }

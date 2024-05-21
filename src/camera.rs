@@ -42,25 +42,21 @@ fn camera_movement(
             if p.translation.x > 0. {
                 p.translation += Vec3 { x:-10., y:0., z:0. } * time.delta_seconds();
             }
-            println!("{:?}",p.translation);
         }
         if input.pressed(KeyCode::KeyD) {
             if p.translation.x < 19. {
                 p.translation += Vec3 { x:10., y:0., z:0. } * time.delta_seconds();
             }
-            println!("{:?}",p.translation);
         }
         if input.pressed(KeyCode::KeyW) {
             if p.translation.y < 10. {
                 p.translation += Vec3 { x:0., y:10., z:0. } * time.delta_seconds();
             } 
-            println!("{:?}",p.translation);
         }
         if input.pressed(KeyCode::KeyS) {
             if p.translation.y > 9. {
                 p.translation += Vec3 { x:0., y:-10., z:0. } * time.delta_seconds();
             }
-            println!("{:?}",p.translation);
         } 
 
         for mut c in camera_query.iter_mut() {
@@ -68,13 +64,11 @@ fn camera_movement(
                 if c.scale < 0.0332 {
                     c.scale += 0.02 * time.delta_seconds();
                 }
-                println!("{:?}", c.scale);
             }
             if input.pressed(KeyCode::KeyQ) {
                 if c.scale > 0.015 {
                     c.scale += -0.02 * time.delta_seconds();
                 }
-                println!("{:?}", c.scale);
             }   
         }
 
