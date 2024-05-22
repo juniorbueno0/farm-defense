@@ -76,6 +76,9 @@ fn draw_path(
         for tile in query.iter_mut() {
             commands.entity(tile).despawn();
         }
+
+        // clear the vector - testing only 
+        metas.0 = vec![];
  
         let mut rng = thread_rng();
 

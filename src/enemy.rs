@@ -33,7 +33,7 @@ fn spawn_enemies(
         commands.spawn(
             SpriteBundle {
             sprite: Sprite{color:Color::Rgba{red:0.4,green:0.6,blue:0.7,alpha:1.},..default()},
-            transform: Transform::from_xyz(metas.0[0].x, metas.0[0].y, 1.),
+            transform: Transform::from_xyz(metas.0[0].x, metas.0[0].y, 2.),
             ..default()
         }).insert(EnemyData{meta_reached:true,actual_meta:vec2(0., 0.),meta_state:0});
     }
@@ -60,22 +60,12 @@ fn movement(
 ) {
     for mut enemy in query.iter_mut() {
         
-        if enemy.0.translation.x > enemy.1.actual_meta.x {
-            enemy.0.translation.x -= 1.5 * time.delta_seconds(); 
-        }
-        if enemy.0.translation.x < enemy.1.actual_meta.x {
-            enemy.0.translation.x += 1.5  * time.delta_seconds(); 
-        }
-        if enemy.0.translation.y > enemy.1.actual_meta.y {
-            enemy.0.translation.y -= 1.5 * time.delta_seconds(); 
-        }
-        if enemy.0.translation.y < enemy.1.actual_meta.y {
-            enemy.0.translation.y += 1.5  * time.delta_seconds(); 
-        }
-        
-        if enemy.1.meta_state == 0 {
-            enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize];
-        }
+        if enemy.0.translation.x > enemy.1.actual_meta.x { enemy.0.translation.x-=1.5*time.delta_seconds(); }
+        if enemy.0.translation.x < enemy.1.actual_meta.x { enemy.0.translation.x+=1.5*time.delta_seconds(); }
+        if enemy.0.translation.y > enemy.1.actual_meta.y { enemy.0.translation.y-=1.5*time.delta_seconds(); }
+        if enemy.0.translation.y < enemy.1.actual_meta.y { enemy.0.translation.y+=1.5*time.delta_seconds(); }
+
+        if enemy.1.meta_state == 0 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
         if enemy.1.meta_state == 1 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
         if enemy.1.meta_state == 2 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
         if enemy.1.meta_state == 3 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
@@ -89,7 +79,6 @@ fn movement(
         if (enemy.0.translation.y > enemy.1.actual_meta.y - 0.1) && (enemy.0.translation.y < enemy.1.actual_meta.y + 0.1) {
             if (enemy.0.translation.x > enemy.1.actual_meta.x - 0.1) && (enemy.0.translation.x < enemy.1.actual_meta.x + 0.1) {
                 enemy.1.meta_reached = true;
-                println!("meta reached");
             } 
         }
         

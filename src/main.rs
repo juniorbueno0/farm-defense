@@ -27,4 +27,10 @@ fn main() {
 
 // PENDING 
 // add perlin to generate trees etc cannot build there 
+// day night cicle 
+// vegetables can be ahrvested 1 tiem a day 
+// gambling machine 
+// crops can be harvested and selled 
+// build turrets
+// enemies give money too
 // 
