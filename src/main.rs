@@ -5,11 +5,11 @@ mod mouse;
 mod enemy;
 mod camera;
 mod worldtile;
-use crate::enemy::EnemyPlugin;
-use crate::mouse::MouseInteractionsPlugin;
 use crate::ui::UiPlugin;
+use crate::enemy::EnemyPlugin;
 use crate::camera::CameraPlugin;
 use crate::worldtile::WorldTilePlugin;
+use crate::mouse::MouseInteractionsPlugin;
 
 fn main() {
     App::new()

@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{math::vec2, prelude::*};
 use rand::prelude::*;
 
@@ -19,7 +21,20 @@ pub struct Metas(pub Vec<Vec2>);
 #[derive(Component, Debug, Clone)]
 pub enum ObjectType {
     Potato,
-    Empty
+    Empty,
+    TurretA
+}
+
+#[derive(Component, Debug)]
+struct CropComponent {
+    is_ready: bool,
+    age: f32
+}
+
+#[derive(Component, Debug)]
+struct TurretComponent {
+    cooldown: Timer,
+    damage: i32
 }
 
 use crate::mouse::MyMouseCoords;
@@ -30,7 +45,7 @@ pub struct WorldTilePlugin;
 impl Plugin for WorldTilePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, draw_map)
-            .add_systems(Update, (draw_path, mouse_highligth, spawn_object));
+            .add_systems(Update, (draw_path, mouse_highligth, spawn_object, turret));
     }
 }
 
@@ -77,7 +92,7 @@ fn draw_path(
             commands.entity(tile).despawn();
         }
 
-        // clear the vector - testing only 
+        // clear the ols stopping points - testing only 
         metas.0 = vec![];
  
         let mut rng = thread_rng();
@@ -155,15 +170,37 @@ fn spawn_object(
     mut commands: Commands,
     mouse_coords: Res<MyMouseCoords>,
     input: Res<ButtonInput<MouseButton>>,
-    mut object_selected: ResMut<ObjectSelected>
+    mut object_selected: ResMut<ObjectSelected>,
 ) {
+
+
     if input.just_pressed(MouseButton::Left) {
         match object_selected.0 {
             ObjectType::Empty => { println!("empty"); },
             ObjectType::Potato => { 
-                commands.spawn(SpriteBundle{sprite:Sprite{color:Color::Rgba{red:0.1, green:0.6,blue:0.6,alpha:1.},..default()},transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()});
+                commands.spawn(SpriteBundle{sprite:Sprite{color:Color::Rgba{red:0.1, green:0.6,blue:0.6,alpha:1.},..default()},transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.),..default()});
                 object_selected.0 = ObjectType::Empty;
             },
+            ObjectType::TurretA => { 
+                commands.spawn(SpriteBundle{
+                    sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},
+                    transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()}
+                ).insert(TurretComponent{cooldown:Timer::from_seconds(10., TimerMode::Repeating),damage:10});
+                object_selected.0 = ObjectType::Empty;
+             } 
+        }
+    }
+}
+
+fn turret(
+    mut query: Query<&mut TurretComponent, With<TurretComponent>>,
+    time: Res<Time>
+) { // tirret logic
+    for mut t in query.iter_mut() {
+        t.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
+        println!("{:?}",t.cooldown.elapsed_secs());
+        if t.cooldown.finished() {
+            println!("finished")
         }
     }
 }

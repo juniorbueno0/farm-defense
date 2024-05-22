@@ -32,9 +32,8 @@ fn setup(mut commands: Commands) {
             style:Style{
                 display:Display::Flex,
                 flex_direction:FlexDirection::Column,
-                justify_items: JustifyItems::Center,
                 justify_content:JustifyContent::Center,
-                width:Val::Px(200.),
+                width:Val::Px(240.),
                 height:Val::Percent(100.),
                 ..default()
             },
@@ -42,11 +41,13 @@ fn setup(mut commands: Commands) {
             ..default()
         }).with_children(|s|{
             s.spawn(NodeBundle{
-                style:Style{display:Display::Flex,width:Val::Px(180.),height:Val::Px(450.),margin:UiRect{left:Val::Px(10.),..default()},..default()},
-                background_color:BackgroundColor(Color::Rgba{red:0.6,green:0.2,blue:0.6,alpha:1.}),
+                style:Style{display:Display::Flex,flex_wrap:FlexWrap::Wrap,justify_content:JustifyContent::Center,width:Val::Px(220.),height:Val::Px(450.),margin:UiRect::left(Val::Px(5.)),..default()},
+                background_color:BackgroundColor(Color::Rgba{red:0.1,green:0.8,blue:0.1,alpha:0.}),
                 ..default()
             }).with_children(|b|{
-                b.spawn(inventory_button(Color::Rgba { red: 1., green: 0.54, blue: 0., alpha: 0.5 })).insert(ButtonType(ObjectType::Potato));
+                b.spawn(inventory_button(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.5 })).insert(ButtonType(ObjectType::Potato));
+            }).with_children(|b|{
+                b.spawn(inventory_button(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.5 })).insert(ButtonType(ObjectType::TurretA));
             });
         });
     });
@@ -55,9 +56,9 @@ fn setup(mut commands: Commands) {
 fn inventory_button(color: Color) -> ButtonBundle {
     ButtonBundle{
         style: Style{
-            width: Val::Px(100.),
-            height: Val::Px(95.),
-            margin: UiRect::left(Val::Px(1.)),
+            width: Val::Px(200.),
+            height: Val::Px(200.),
+            margin: UiRect::new(Val::Px(0.),Val::Px(0.),Val::Px(10.),Val::Px(0.)),
             ..default()
         },
         background_color: BackgroundColor(color),
@@ -76,7 +77,7 @@ fn match_btn_sel(
                 obj_selected.0 = inter.2.0.clone();
             },
             Interaction::Hovered => {},
-            Interaction::None => {*inter.1 = BackgroundColor(Color::Rgba { red: 1., green: 0.54, blue: 0., alpha: 1. });},
+            Interaction::None => {*inter.1 = BackgroundColor(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.4  });},
         }
     }
 }
