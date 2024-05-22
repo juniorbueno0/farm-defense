@@ -34,5 +34,6 @@ fn cursor_to_world_position(
         let y_value: i32 = mycoords.0.y as i32;
         // to f32 
         mycoords.0 = Vec2::new(x_value as f32, y_value as f32);
+        println!("{:?}",mycoords.0);
     }
 }

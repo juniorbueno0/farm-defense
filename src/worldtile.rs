@@ -13,6 +13,9 @@ struct PathTile;
 #[derive(Component)]
 struct MouseSelection;
 
+#[derive(Resource, Debug)]
+pub struct Metas(pub Vec<Vec2>);
+
 #[derive(Component, Debug, Clone)]
 pub enum ObjectType {
     Potato,
@@ -66,9 +69,10 @@ fn draw_path(
     mut commands: Commands,
     input: Res<ButtonInput<KeyCode>>,
     mut query: Query<Entity, With<PathTile>>,
+    mut metas: ResMut<Metas>
 ) {
     if input.just_pressed(KeyCode::KeyB) {    
- 
+        
         for tile in query.iter_mut() {
             commands.entity(tile).despawn();
         }
@@ -101,9 +105,14 @@ fn draw_path(
                 a += 1;
                 y += 1;
                 
-                // if flag_b || (max_fordward_tiles == y) {
-                //     metas.0.push(vec2(x as f32, a as f32));
-                // }
+                if flag_b || (max_fordward_tiles == y) {
+                    
+                    if flag_b {
+                        metas.0.push(vec2(x as f32, a as f32 - 1.));        
+                    }else {
+                        metas.0.push(vec2(x as f32, a as f32));
+                    }
+                }
 
                 // connect the new path 
                 if last_x_pos != 0 && flag_b {

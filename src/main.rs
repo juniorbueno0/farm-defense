@@ -21,6 +21,9 @@ fn main() {
         .add_plugins(EnemyPlugin)
         .run();
 }
+// B draw the path
+// Y spawn the entity that follow the path
+// P print stopping points 
 
 // PENDING 
 // add perlin to generate trees etc cannot build there 
