@@ -6,6 +6,7 @@ use rand::prelude::*;
 
 const WORLD_SIZE_X: i32 = 20;
 const WORLD_SIZE_Y: i32 = 20;
+const TOTAL_SIDEWAYS: i32 = 10;
 
 #[derive(Component, Debug)]
 struct WorldTile;
@@ -112,10 +113,9 @@ fn draw_path(
         let mut a: i32 = 0;
 
         let mut last_x_pos: i32 = 0;
-        let total_sideways: i32 = 10; // NOTE: total_sideways MOD WORLD_SIZE_Y == 0;
-        let max_fordward_tiles:i32 = WORLD_SIZE_Y / total_sideways;
+        let max_fordward_tiles:i32 = WORLD_SIZE_Y / TOTAL_SIDEWAYS;
 
-        while total_sideways > i {
+        while TOTAL_SIDEWAYS > i {
             let x: u32 = rng.gen_range(1..WORLD_SIZE_X as u32 - 2);
             let mut flag_b: bool = true;
             
@@ -133,8 +133,7 @@ fn draw_path(
                 a += 1;
                 y += 1;
                 
-                if flag_b || (max_fordward_tiles == y) {
-                    
+                if flag_b || (max_fordward_tiles == y) {  
                     if flag_b {
                         metas.0.push(vec2(x as f32, a as f32 - 1.));        
                     }else {
@@ -212,17 +211,21 @@ fn turret(
             let x_distance: f32 = e.translation.x - t.1.translation.x;
             let y_distance: f32 = e.translation.y - t.1.translation.y;
 
-            if (x_distance <= 4.0) && (y_distance <= 4.0) {
-                t.0.cooldown.tick(Duration::from_secs_f32(6.0 * time.delta_seconds_f64() as f32));
+            if (x_distance <= t.0.range as f32) && (y_distance <= t.0.range as f32) {
+                t.0.cooldown.tick(Duration::from_secs_f32(6. * time.delta_seconds_f64() as f32));
                 if t.0.cooldown.finished() {
                     commands.spawn(SpriteBundle{
                         sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},
                         transform:Transform::from_xyz(t.1.translation.x, t.1.translation.y, 3.), ..default()}
-                    ).insert(BulletComponent{life_time:1.6,direction:Vec2::new(e.translation.x, e.translation.y)});
+                    ).insert(
+                        BulletComponent{life_time:0.025,direction:Vec2::new(e.translation.x, e.translation.y)}
+                    );
                 }
             }
+
         }
     }
+    
 }
 
 fn bullet_manager(
@@ -233,15 +236,14 @@ fn bullet_manager(
     for mut b in query.iter_mut() {
         // lifetime
         b.1.life_time -= 0.1 * time.delta_seconds_f64() as f32;
-        if b.1.life_time <= 0. { commands.entity(b.0).despawn(); }
+        if b.1.life_time <= 0. { 
+            commands.entity(b.0).despawn(); 
+        }
         let a = b.2.translation;
         // speed
-        b.2.translation += (vec3(b.1.direction.x - a.x,b.1.direction.y - a.y,0.) * 2.) * time.delta_seconds_f64() as f32;
+        b.2.translation += (vec3(b.1.direction.x - a.x,b.1.direction.y - a.y,0.) * 10.) * time.delta_seconds_f64() as f32;
     }
 }
-
-// sum the result of (res = t.x - e.x) to the act pos (t.x + res;) 
-// if bullet get spawned it mean that it has a taget
 
 fn mouse_highligth(
     mouse_coords: Res<MyMouseCoords>,

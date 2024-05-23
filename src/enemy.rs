@@ -1,7 +1,6 @@
 use bevy::{math::vec2, prelude::*};
 
-// #[derive(Resource, Debug)]
-// struct Metas(Vec<Vec2>);
+const ENEMY_SPEED: f32 = 2.0;
 
 #[derive(Component)]
 pub struct EnemyData {
@@ -17,12 +16,9 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(Metas(vec![]))
-            // .add_systems(Startup, setup)
             .add_systems(Update, (spawn_enemies, movement, print_metas));
     }
 }
-
-fn _setup() { }
 
 fn spawn_enemies(
     input: Res<ButtonInput<KeyCode>>,
@@ -55,49 +51,60 @@ fn print_metas(input: Res<ButtonInput<KeyCode>>, metas: Res<Metas>,mut commands:
 
 // need refactorization
 fn movement(
-    mut query: Query<(&mut Transform, &mut EnemyData), With<EnemyData>>,
+    mut query: Query<(&mut Transform, &mut EnemyData, Entity), With<EnemyData>>,
+    mut commands: Commands,
     metas: Res<Metas>,
     time: Res<Time>
 ) {
     for mut enemy in query.iter_mut() {
         
-        if enemy.0.translation.x > enemy.1.actual_meta.x { enemy.0.translation.x-=1.5*time.delta_seconds(); }
-        if enemy.0.translation.x < enemy.1.actual_meta.x { enemy.0.translation.x+=1.5*time.delta_seconds(); }
-        if enemy.0.translation.y > enemy.1.actual_meta.y { enemy.0.translation.y-=1.5*time.delta_seconds(); }
-        if enemy.0.translation.y < enemy.1.actual_meta.y { enemy.0.translation.y+=1.5*time.delta_seconds(); }
+        if enemy.0.translation.x > enemy.1.actual_meta.x { enemy.0.translation.x-=ENEMY_SPEED*time.delta_seconds(); }
+        if enemy.0.translation.x < enemy.1.actual_meta.x { enemy.0.translation.x+=ENEMY_SPEED*time.delta_seconds(); }
+        if enemy.0.translation.y > enemy.1.actual_meta.y { enemy.0.translation.y-=ENEMY_SPEED*time.delta_seconds(); }
+        if enemy.0.translation.y < enemy.1.actual_meta.y { enemy.0.translation.y+=ENEMY_SPEED*time.delta_seconds(); }
 
-        if enemy.1.meta_state == 0 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 1 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 2 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 3 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 4 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 5 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 6 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 7 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 8 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 9 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 10 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 11 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 12 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 13 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 14 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 15 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 16 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 17 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
-        if enemy.1.meta_state == 18 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        enemy.1.actual_meta = match enemy.1.meta_state {
+            0 => metas.0[0],
+            1 => metas.0[1],
+            2 => metas.0[2],
+            3 => metas.0[3],
+            4 => metas.0[4],
+            5 => metas.0[5],
+            6 => metas.0[6],
+            7 => metas.0[7],
+            8 => metas.0[8],
+            9 => metas.0[9],
+            10 => metas.0[10],
+            11 => metas.0[11],
+            12 => metas.0[12],
+            13 => metas.0[13],
+            14 => metas.0[14],
+            15 => metas.0[15],
+            16 => metas.0[16],
+            17 => metas.0[17],
+            18 => metas.0[18],
+            19 => metas.0[19],
+            _ => {
+                commands.entity(enemy.2).despawn();
+                Default::default()
+            }
+        };
 
-        if (enemy.0.translation.y > enemy.1.actual_meta.y - 0.1) && (enemy.0.translation.y < enemy.1.actual_meta.y + 0.1) {
-            if (enemy.0.translation.x > enemy.1.actual_meta.x - 0.1) && (enemy.0.translation.x < enemy.1.actual_meta.x + 0.1) {
-                enemy.1.meta_reached = true;
+        if (enemy.0.translation.y > enemy.1.actual_meta.y - 0.05) && 
+            (enemy.0.translation.y < enemy.1.actual_meta.y + 0.05) {
+            if (enemy.0.translation.x > enemy.1.actual_meta.x - 0.05) && 
+                (enemy.0.translation.x < enemy.1.actual_meta.x + 0.05) {
+                    enemy.1.meta_reached = true;
             } 
         }
         
-        if enemy.1.meta_reached && enemy.1.meta_state <= 18{
-            enemy.1.meta_state+=1;
+        if enemy.1.meta_reached && (enemy.1.meta_state <= 19) {
+            enemy.1.meta_state += 1;
+            enemy.1.meta_reached = false;
             println!("new state: {:?}", enemy.1.meta_state);
             println!("actual position: {:?}", enemy.0.translation);
             println!("next position: {:?}", enemy.1.actual_meta);
-            enemy.1.meta_reached = false;
         }
+
     }
 }

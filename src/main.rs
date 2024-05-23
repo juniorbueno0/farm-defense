@@ -43,3 +43,6 @@ fn main() {
 
 // enemy path following
 // fix the enemy stopping points please when gets to the max, harcoded stopping points it stops
+
+// change the part of the states (the hardcoded one)
+// use the total_sideways multiplied by 2 and there you have the toal stoping points
