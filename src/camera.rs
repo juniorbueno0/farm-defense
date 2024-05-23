@@ -29,6 +29,8 @@ fn setup(mut commands: Commands) {
         .looking_at(Vec3::ZERO, Vec3::Y),
         ..Default::default()
     }).insert(MainCamera);
+
+    
 }
 
 fn camera_movement(

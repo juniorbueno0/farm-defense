@@ -1,11 +1,15 @@
 use bevy::prelude::*;
 
 mod ui;
+mod crop;
 mod mouse;
 mod enemy;
+mod turret;
 mod camera;
 mod worldtile;
 use crate::ui::UiPlugin;
+use crate::crop::CropPlugin;
+use crate::turret::TurretPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::camera::CameraPlugin;
 use crate::worldtile::WorldTilePlugin;
@@ -18,6 +22,8 @@ fn main() {
         .add_plugins(CameraPlugin)
         .add_plugins(MouseInteractionsPlugin)
         .add_plugins(WorldTilePlugin)
+        .add_plugins(CropPlugin)
+        .add_plugins(TurretPlugin)
         .add_plugins(EnemyPlugin)
         .run();
 }
