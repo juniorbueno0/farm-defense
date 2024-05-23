@@ -4,7 +4,7 @@ use bevy::{math::vec2, prelude::*};
 // struct Metas(Vec<Vec2>);
 
 #[derive(Component)]
-struct EnemyData {
+pub struct EnemyData {
     meta_reached: bool,
     actual_meta: Vec2,
     meta_state: i32
@@ -53,6 +53,7 @@ fn print_metas(input: Res<ButtonInput<KeyCode>>, metas: Res<Metas>,mut commands:
     }
 }
 
+// need refactorization
 fn movement(
     mut query: Query<(&mut Transform, &mut EnemyData), With<EnemyData>>,
     metas: Res<Metas>,
@@ -75,6 +76,15 @@ fn movement(
         if enemy.1.meta_state == 7 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
         if enemy.1.meta_state == 8 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
         if enemy.1.meta_state == 9 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 10 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 11 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 12 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 13 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 14 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 15 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 16 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 17 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
+        if enemy.1.meta_state == 18 { enemy.1.actual_meta = metas.0[enemy.1.meta_state as usize]; }
 
         if (enemy.0.translation.y > enemy.1.actual_meta.y - 0.1) && (enemy.0.translation.y < enemy.1.actual_meta.y + 0.1) {
             if (enemy.0.translation.x > enemy.1.actual_meta.x - 0.1) && (enemy.0.translation.x < enemy.1.actual_meta.x + 0.1) {
@@ -82,7 +92,7 @@ fn movement(
             } 
         }
         
-        if enemy.1.meta_reached {
+        if enemy.1.meta_reached && enemy.1.meta_state <= 18{
             enemy.1.meta_state+=1;
             println!("new state: {:?}", enemy.1.meta_state);
             println!("actual position: {:?}", enemy.0.translation);

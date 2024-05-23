@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use bevy::transform::commands;
+use bevy::math::vec3;
 use bevy::{math::vec2, prelude::*};
 use rand::prelude::*;
 
@@ -35,14 +35,18 @@ struct CropComponent {
 #[derive(Component, Debug)]
 struct TurretComponent {
     cooldown: Timer,
+    enemy_nearby: bool,
+    enemy_dir: Vec2,
+    range: i32
 }
 
 #[derive(Component, Debug)]
 struct BulletComponent {
     life_time: f32,
-    direction: Vec3
+    direction: Vec2
 }
 
+use crate::enemy::EnemyData;
 use crate::mouse::MyMouseCoords;
 use crate::ui::ObjectSelected; // object selected from the btn
 
@@ -189,7 +193,7 @@ fn spawn_object(
                 commands.spawn(SpriteBundle{
                     sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},
                     transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()}
-                ).insert(TurretComponent{cooldown:Timer::from_seconds(2., TimerMode::Repeating)});
+                ).insert(TurretComponent{enemy_dir:vec2(0., 0.),range:4,enemy_nearby:true,cooldown:Timer::from_seconds(2., TimerMode::Repeating)});
                 object_selected.0 = ObjectType::Empty;
              } 
         }
@@ -197,18 +201,26 @@ fn spawn_object(
 }
 
 fn turret(
-    mut query: Query<(&mut TurretComponent, &Transform), With<TurretComponent>>,
+    mut t_query: Query<(&mut TurretComponent, &Transform), With<TurretComponent>>,
+    e_query: Query<&Transform, With<EnemyData>>,
     mut commands: Commands,
     time: Res<Time>
-) { // tirret logic
-    for mut t in query.iter_mut() {
-        t.0.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
-        println!("{:?}",t.0.cooldown.elapsed_secs());
-        if t.0.cooldown.finished() {
-            commands.spawn(SpriteBundle{
-                sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},
-                transform:Transform::from_xyz(t.1.translation.x, t.1.translation.y, 3.), ..default()}
-            ).insert(BulletComponent{life_time:1.,direction:Vec3::new(1., 0., 0.)});
+) {
+    for mut t in t_query.iter_mut() {
+        for e in e_query.iter() {
+
+            let x_distance: f32 = e.translation.x - t.1.translation.x;
+            let y_distance: f32 = e.translation.y - t.1.translation.y;
+
+            if (x_distance <= 4.0) && (y_distance <= 4.0) {
+                t.0.cooldown.tick(Duration::from_secs_f32(6.0 * time.delta_seconds_f64() as f32));
+                if t.0.cooldown.finished() {
+                    commands.spawn(SpriteBundle{
+                        sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},
+                        transform:Transform::from_xyz(t.1.translation.x, t.1.translation.y, 3.), ..default()}
+                    ).insert(BulletComponent{life_time:1.6,direction:Vec2::new(e.translation.x, e.translation.y)});
+                }
+            }
         }
     }
 }
@@ -221,14 +233,15 @@ fn bullet_manager(
     for mut b in query.iter_mut() {
         // lifetime
         b.1.life_time -= 0.1 * time.delta_seconds_f64() as f32;
-        if b.1.life_time == 0. {
-            commands.entity(b.0).despawn();
-        }
-        // direction 
-        b.2.translation.x += b.1.direction.x * time.delta_seconds_f64() as f32;
-        b.2.translation.y += b.1.direction.y * time.delta_seconds_f64() as f32; 
+        if b.1.life_time <= 0. { commands.entity(b.0).despawn(); }
+        let a = b.2.translation;
+        // speed
+        b.2.translation += (vec3(b.1.direction.x - a.x,b.1.direction.y - a.y,0.) * 2.) * time.delta_seconds_f64() as f32;
     }
 }
+
+// sum the result of (res = t.x - e.x) to the act pos (t.x + res;) 
+// if bullet get spawned it mean that it has a taget
 
 fn mouse_highligth(
     mouse_coords: Res<MyMouseCoords>,

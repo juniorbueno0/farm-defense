@@ -34,3 +34,12 @@ fn main() {
 // build turrets
 // enemies give money too
 // 
+
+// turrets
+// detect the closest enemy
+// select the closest enemy and get the position 
+// if there is no enemys in the range cant shoot
+
+
+// enemy path following
+// fix the enemy stopping points please when gets to the max, harcoded stopping points it stops
