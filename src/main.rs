@@ -54,3 +54,10 @@ fn main() {
 
 // change the part of the states (the hardcoded one)
 // use the total_sideways multiplied by 2 and there you have the toal stoping points
+
+// fix the hitboxes (sizes of the colliders)  
+
+// fix the direction of the bullet
+
+// crops 
+// hydration keeps getting added FIXIT

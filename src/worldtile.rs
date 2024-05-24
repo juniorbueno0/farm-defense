@@ -227,30 +227,3 @@ fn mouse_highligth(
         pixel.translation = Vec3::new(mouse_coords.0.x, mouse_coords.0.y,1.);
     }
 }
-
-// fn handle_raycast_click( // despawn the raycaster that check the crops on click
-//     time: Res<Time>,
-//     mut commands: Commands,
-//     mut u_query: Query<(Entity, &mut RaycastInputClick), With<RaycastInputClick>>
-// ) {
-//     for mut e in u_query.iter_mut() {
-//         e.1.life_time.tick(Duration::from_secs_f32(1.* time.delta_seconds_f64() as f32) );
-//         if e.1.life_time.finished() {
-//             commands.entity(e.0).despawn();    
-//         }
-//     }
-// }
-
-// fn print_hits(query: Query<(&RayCaster, &RayHits)>) {
-//     for (ray, hits) in &query {
-//         //iter() iter_sorted()
-//         for hit in hits.iter() {
-//             println!(
-//                 "Hit entity {:?} at {} with normal {}",
-//                 hit.entity,
-//                 ray.origin + *ray.direction * hit.time_of_impact,
-//                 hit.normal,
-//             );
-//         }
-//     }
-// }

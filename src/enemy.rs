@@ -1,4 +1,5 @@
 use bevy::{math::vec2, prelude::*};
+use bevy_xpbd_2d::{components::RigidBody, plugins::collision::Collider};
 
 const ENEMY_SPEED: f32 = 2.0;
 
@@ -6,7 +7,8 @@ const ENEMY_SPEED: f32 = 2.0;
 pub struct EnemyData {
     meta_reached: bool,
     actual_meta: Vec2,
-    meta_state: i32
+    meta_state: i32,
+    pub health: f32
 }
 
 use crate::worldtile::Metas;
@@ -26,12 +28,14 @@ fn spawn_enemies(
     metas: Res<Metas>,
 ) {
     if input.just_pressed(KeyCode::KeyY) {
-        commands.spawn(
+        commands.spawn((
+            RigidBody::Static,
+            Collider::rectangle(2.5, 2.5),
             SpriteBundle {
             sprite: Sprite{color:Color::Rgba{red:0.4,green:0.6,blue:0.7,alpha:1.},..default()},
             transform: Transform::from_xyz(metas.0[0].x, metas.0[0].y, 2.),
-            ..default()
-        }).insert(EnemyData{meta_reached:true,actual_meta:vec2(0., 0.),meta_state:0});
+            ..default()}
+        )).insert(EnemyData{meta_reached:true,actual_meta:vec2(0., 0.),meta_state:0,health:100.});
     }
 }
 

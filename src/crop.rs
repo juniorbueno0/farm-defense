@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use bevy::input::mouse;
 use bevy::{math::vec3, prelude::*};
 use bevy_xpbd_2d::plugins::spatial_query::RayCaster;
 use bevy_xpbd_2d::plugins::spatial_query::RayHits;
@@ -13,6 +14,7 @@ pub struct CropComponent {
 
 use crate::worldtile::SprinklerComponent;
 use crate::worldtile::RaycastInputClick;
+use crate::mouse::MyMouseCoords;
 
 pub struct CropPlugin;
 
@@ -28,40 +30,74 @@ fn grow_manager(
     mut s_query: Query<(&Transform, &mut SprinklerComponent), With<SprinklerComponent>>,
     time: Res<Time>
 ) {
-    for mut crop in c_query.iter_mut() {
-        if crop.1.is_ready { return; }
+    // for mut crop in c_query.iter_mut() {
+    //     if crop.1.is_ready { return; }
 
-        for mut s in s_query.iter_mut() {
-            s.1.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
-            if s.1.cooldown.finished() {
+    //     for mut s in s_query.iter_mut() {
+    //         s.1.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
+    //         if s.1.cooldown.finished() {
                 
+    //             let _a: Vec3 = s.0.translation - vec3(0.,1.,0.);
+    //             let _b: Vec3 = s.0.translation + vec3(0.,1.,0.);
+    //             let _c: Vec3 = s.0.translation - vec3(1.,0.,0.);
+    //             let _d: Vec3 = s.0.translation + vec3(1.,0.,0.);
+                
+    //             crop.1.hydrated += match s.0.translation {
+    //                 _a => { 5. }
+    //                 _b => { 5. }
+    //                 _c => { 5. }
+    //                 _d => { 5. }
+    //             };
+                
+    //             println!("{:?}", crop.1);
+    //         }
+    //     }
+
+    //     if crop.1.hydrated >= 0.0 {
+    //         crop.1.grow -= 1.* time.delta_seconds_f64() as f32; 
+    //         crop.1.hydrated -= 1.* time.delta_seconds_f64() as f32; 
+    //     }
+
+    //     if crop.1.grow <= 0. {
+    //         crop.1.is_ready = true;
+    //         crop.2.color = Color::rgb(0.1,0.6,0.66);
+    //         println!("{:?}", crop.1);
+    //     }
+    // }    
+
+    for mut s in s_query.iter_mut() {
+        s.1.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
+
+        for mut crop in c_query.iter_mut() {
+            println!("{:?}", crop.1);
+
+            if s.1.cooldown.finished() {
+            
                 let _a: Vec3 = s.0.translation - vec3(0.,1.,0.);
                 let _b: Vec3 = s.0.translation + vec3(0.,1.,0.);
                 let _c: Vec3 = s.0.translation - vec3(1.,0.,0.);
                 let _d: Vec3 = s.0.translation + vec3(1.,0.,0.);
                 
-                crop.1.hydrated += match s.0.translation {
+                crop.1.hydrated += match crop.0.translation {
                     _a => { 5. }
                     _b => { 5. }
                     _c => { 5. }
                     _d => { 5. }
                 };
-                
-                println!("{:?}", crop.1);
+            }
+
+            if crop.1.is_ready { return; }
+    
+            if crop.1.grow <= 0. {
+                crop.1.is_ready = true;
+                crop.2.color = Color::rgb(0.1,0.6,0.9);
+            }else if crop.1.hydrated >= 0.0 {
+                crop.1.grow -= 1.* time.delta_seconds_f64() as f32; 
+                crop.1.hydrated -= 1.* time.delta_seconds_f64() as f32; 
             }
         }
+    }
 
-        if crop.1.hydrated >= 0.0 {
-            crop.1.grow -= 1.* time.delta_seconds_f64() as f32; 
-            crop.1.hydrated -= 1.* time.delta_seconds_f64() as f32; 
-        }
-
-        if crop.1.grow <= 0. {
-            crop.1.is_ready = true;
-            crop.2.color = Color::rgb(0.1,0.6,0.66);
-            println!("{:?}", crop.1);
-        }
-    }    
 }
 
 fn handle_raycast_click( // despawn the raycaster that check the crops on click
@@ -80,7 +116,8 @@ fn handle_raycast_click( // despawn the raycaster that check the crops on click
 fn raycast_hits(
     mut commands: Commands,
     query: Query<(&RayCaster, &RayHits)>,
-    mut c_query: Query<(Entity, &mut CropComponent), With<CropComponent>>
+    mouse_coords: Res<MyMouseCoords>,
+    mut c_query: Query<(Entity, &mut CropComponent, &Transform), With<CropComponent>>
 ) {
     for (ray, hits) in &query {
         //iter() iter_sorted()
@@ -93,7 +130,7 @@ fn raycast_hits(
             );
 
             for crop in c_query.iter_mut() {
-                if crop.1.is_ready {
+                if crop.1.is_ready && (Vec2{x:crop.2.translation.x,y:crop.2.translation.y} == Vec2{x:mouse_coords.0.x,y:mouse_coords.0.y}){
                     commands.entity(crop.0).despawn();
                 }
             }
