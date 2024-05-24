@@ -47,6 +47,8 @@ fn setup(mut commands: Commands) {
             }).with_children(|b|{
                 b.spawn(inventory_button(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.5 })).insert(ButtonType(ObjectType::Potato));
             }).with_children(|b|{
+                b.spawn(inventory_button(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.5 })).insert(ButtonType(ObjectType::Sprinkler));
+            }).with_children(|b|{
                 b.spawn(inventory_button(Color::Rgba { red: 0.4, green: 0.4, blue: 0.8, alpha: 0.5 })).insert(ButtonType(ObjectType::TurretA));
             });
         });

@@ -32,7 +32,7 @@ fn turret(
             let y_distance: f32 = e.translation.y - t.1.translation.y;
 
             if (x_distance <= t.0.range as f32) && (y_distance <= t.0.range as f32) {
-                t.0.cooldown.tick(Duration::from_secs_f32(6. * time.delta_seconds_f64() as f32));
+                t.0.cooldown.tick(Duration::from_secs_f32(5. * time.delta_seconds_f64() as f32));
                 if t.0.cooldown.finished() {
                     commands.spawn(SpriteBundle{
                         sprite:Sprite{color:Color::Rgba{red:1., green:1.,blue:0.8,alpha:1.},..default()},

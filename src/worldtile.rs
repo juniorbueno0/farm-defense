@@ -1,6 +1,6 @@
-use bevy::{math::vec2, prelude::*};
 use std::time::Duration;
-use bevy::math::vec3;
+
+use bevy::{math::vec2, prelude::*};
 use rand::prelude::*;
 
 const WORLD_SIZE_X: i32 = 20;
@@ -23,7 +23,14 @@ pub struct Metas(pub Vec<Vec2>);
 pub enum ObjectType {
     Potato,
     Empty,
-    TurretA
+    TurretA,
+    Sprinkler
+}
+
+#[derive(Component, Debug)]
+pub struct SprinklerComponent {
+    pub range: i32,
+    pub cooldown: Timer
 }
 
 #[derive(Component, Debug)]
@@ -172,7 +179,7 @@ fn spawn_object(
                     sprite:Sprite{color:Color::Rgba{red:0.1, green:0.6,blue:0.6,alpha:1.},..default()},
                     transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.),
                     ..default()
-                }).insert(CropComponent{is_ready:false,age:10.});
+                }).insert(CropComponent{is_ready:false,hydrated:0., grow:30.});
                 object_selected.0 = ObjectType::Empty;
             },
             ObjectType::TurretA => { 
@@ -181,7 +188,14 @@ fn spawn_object(
                     transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()}
                 ).insert(TurretComponent{range:4,cooldown:Timer::from_seconds(2., TimerMode::Repeating)});
                 object_selected.0 = ObjectType::Empty;
-             } 
+            },
+            ObjectType::Sprinkler => {
+                commands.spawn(SpriteBundle{
+                    sprite:Sprite{color:Color::Rgba{red:1.,green:0.8,blue:0.8,alpha:1.},..default()},
+                    transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()}
+                ).insert(SprinklerComponent{range:1,cooldown:Timer::from_seconds(10., TimerMode::Repeating)});
+                object_selected.0 = ObjectType::Empty;
+            } 
         }
     }
 }
