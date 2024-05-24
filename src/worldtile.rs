@@ -1,11 +1,15 @@
 use std::time::Duration;
 
-use bevy::{math::vec2, prelude::*};
+use bevy::input::mouse;
 use rand::prelude::*;
+use bevy_xpbd_2d::prelude::*;
+use bevy::{math::vec2, prelude::*};
+use bevy_xpbd_2d::plugins::spatial_query::RayCaster;
 
+const TOTAL_SIDEWAYS: i32 = 10;
 const WORLD_SIZE_X: i32 = 20;
 const WORLD_SIZE_Y: i32 = 20;
-const TOTAL_SIDEWAYS: i32 = 10;
+
 
 #[derive(Component, Debug)]
 struct WorldTile;
@@ -15,6 +19,11 @@ struct PathTile;
 
 #[derive(Component)]
 struct MouseSelection;
+
+#[derive(Component)] // check where the player clicks when nothing is selected
+pub struct RaycastInputClick {
+    pub life_time: Timer
+}
 
 #[derive(Resource, Debug)]
 pub struct Metas(pub Vec<Vec2>);
@@ -173,13 +182,23 @@ fn spawn_object(
 ) {
     if input.just_pressed(MouseButton::Left) {
         match object_selected.0 {
-            ObjectType::Empty => { println!("empty"); },
+            ObjectType::Empty => { 
+                // raycast spawn
+                commands.spawn(
+                        RayCaster::new(vec2(mouse_coords.0.x,mouse_coords.0.y),Direction2d::from_xy(mouse_coords.0.x + 0.01,mouse_coords.0.y + 0.01).expect("")),
+                    ).insert(RaycastInputClick { life_time: Timer::from_seconds(1., TimerMode::Once) });
+                println!("empty"); 
+            },
             ObjectType::Potato => { 
-                commands.spawn(SpriteBundle{
-                    sprite:Sprite{color:Color::Rgba{red:0.1, green:0.6,blue:0.6,alpha:1.},..default()},
-                    transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.),
-                    ..default()
-                }).insert(CropComponent{is_ready:false,hydrated:0., grow:30.});
+                commands.spawn((
+                    RigidBody::Static,
+                    Collider::rectangle(1., 1.),
+                    SpriteBundle {
+                        sprite:Sprite{color:Color::Rgba{red:0.1,green:0.6,blue:0.6,alpha:1.},..default()},
+                        transform:Transform::from_xyz(mouse_coords.0.x,mouse_coords.0.y,0.),
+                        ..default()
+                    }
+                )).insert(CropComponent{is_ready:false,hydrated:0., grow:30.});
                 object_selected.0 = ObjectType::Empty;
             },
             ObjectType::TurretA => { 
@@ -195,7 +214,7 @@ fn spawn_object(
                     transform:Transform::from_xyz(mouse_coords.0.x, mouse_coords.0.y, 1.), ..default()}
                 ).insert(SprinklerComponent{range:1,cooldown:Timer::from_seconds(10., TimerMode::Repeating)});
                 object_selected.0 = ObjectType::Empty;
-            } 
+            }
         }
     }
 }
@@ -208,3 +227,30 @@ fn mouse_highligth(
         pixel.translation = Vec3::new(mouse_coords.0.x, mouse_coords.0.y,1.);
     }
 }
+
+// fn handle_raycast_click( // despawn the raycaster that check the crops on click
+//     time: Res<Time>,
+//     mut commands: Commands,
+//     mut u_query: Query<(Entity, &mut RaycastInputClick), With<RaycastInputClick>>
+// ) {
+//     for mut e in u_query.iter_mut() {
+//         e.1.life_time.tick(Duration::from_secs_f32(1.* time.delta_seconds_f64() as f32) );
+//         if e.1.life_time.finished() {
+//             commands.entity(e.0).despawn();    
+//         }
+//     }
+// }
+
+// fn print_hits(query: Query<(&RayCaster, &RayHits)>) {
+//     for (ray, hits) in &query {
+//         //iter() iter_sorted()
+//         for hit in hits.iter() {
+//             println!(
+//                 "Hit entity {:?} at {} with normal {}",
+//                 hit.entity,
+//                 ray.origin + *ray.direction * hit.time_of_impact,
+//                 hit.normal,
+//             );
+//         }
+//     }
+// }

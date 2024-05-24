@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_xpbd_2d::plugins::PhysicsPlugins;
 
 mod ui;
 mod crop;
@@ -18,6 +19,7 @@ use crate::mouse::MouseInteractionsPlugin;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(PhysicsPlugins::default())
         .add_plugins(UiPlugin)
         .add_plugins(CameraPlugin)
         .add_plugins(MouseInteractionsPlugin)
