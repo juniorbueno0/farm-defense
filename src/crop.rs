@@ -30,41 +30,6 @@ fn grow_manager(
     mut s_query: Query<(&Transform, &mut SprinklerComponent), With<SprinklerComponent>>,
     time: Res<Time>
 ) {
-    // for mut crop in c_query.iter_mut() {
-    //     if crop.1.is_ready { return; }
-
-    //     for mut s in s_query.iter_mut() {
-    //         s.1.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
-    //         if s.1.cooldown.finished() {
-                
-    //             let _a: Vec3 = s.0.translation - vec3(0.,1.,0.);
-    //             let _b: Vec3 = s.0.translation + vec3(0.,1.,0.);
-    //             let _c: Vec3 = s.0.translation - vec3(1.,0.,0.);
-    //             let _d: Vec3 = s.0.translation + vec3(1.,0.,0.);
-                
-    //             crop.1.hydrated += match s.0.translation {
-    //                 _a => { 5. }
-    //                 _b => { 5. }
-    //                 _c => { 5. }
-    //                 _d => { 5. }
-    //             };
-                
-    //             println!("{:?}", crop.1);
-    //         }
-    //     }
-
-    //     if crop.1.hydrated >= 0.0 {
-    //         crop.1.grow -= 1.* time.delta_seconds_f64() as f32; 
-    //         crop.1.hydrated -= 1.* time.delta_seconds_f64() as f32; 
-    //     }
-
-    //     if crop.1.grow <= 0. {
-    //         crop.1.is_ready = true;
-    //         crop.2.color = Color::rgb(0.1,0.6,0.66);
-    //         println!("{:?}", crop.1);
-    //     }
-    // }    
-
     for mut s in s_query.iter_mut() {
         s.1.cooldown.tick(Duration::from_secs_f32(1. * time.delta_seconds_f64() as f32));
 
@@ -90,7 +55,7 @@ fn grow_manager(
     
             if crop.1.grow <= 0. {
                 crop.1.is_ready = true;
-                crop.2.color = Color::rgb(0.1,0.6,0.9);
+                crop.2.color = Color::rgb(0.1,0.8,0.9);
             }else if crop.1.hydrated >= 0.0 {
                 crop.1.grow -= 1.* time.delta_seconds_f64() as f32; 
                 crop.1.hydrated -= 1.* time.delta_seconds_f64() as f32; 
