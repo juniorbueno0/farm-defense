@@ -41,16 +41,11 @@ fn main() {
 // crops can be harvested and selled 
 // build turrets
 // enemies give money too
-// 
 
 // turrets
 // detect the closest enemy
 // select the closest enemy and get the position 
 // if there is no enemys in the range cant shoot
-
-
-// enemy path following
-// fix the enemy stopping points please when gets to the max, harcoded stopping points it stops
 
 // change the part of the states (the hardcoded one)
 // use the total_sideways multiplied by 2 and there you have the toal stoping points
